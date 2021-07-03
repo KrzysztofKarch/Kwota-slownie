@@ -1,13 +1,15 @@
-# Program do zamiany liczby zapisanej za pomocą cyfr z zakresu
-# całkowitego [0 - 999999] na liczbę zapisaną słownie
+# Program do zamiany liczby zapisanej za pomocą cyfr z zakresu [0 - 999999] 
+# na liczbę zapisaną słownie. Pełne nazewnictwo złotych i groszy. 
 #
+# Autor: Krzysztof Karch 
+# Mail:  krzysztof.karch@wp.pl
+# Modyfikacja: 03.07.2021
 #
 # OPIS
-# Liczby składają się z rzędów jedności, dziesiątek i setek. Rząd tysiąca (lub dziesiątek tysięcy) traktujemy jak
-# powtórzony rząd jedności (lub dziesiątek), z dodanym słowem "tysiąc" w odpowiedniej odmianie gramatycznej.
+# Liczby składają się z rzędów jedności, dziesiątek i setek. Rząd tysiąca (lub dziesiątek tysięcy) traktujemy 
+# jak powtórzony rząd jedności (lub dziesiątek), z dodanym słowem "tysiąc" w odpowiedniej odmianie gramatycznej.
 # Liczbę zapisaną słownie budujemy za pomocą 3 funkcji bazowych, pobrana liczba jest sprawdzana
 # i w zależności od jej długości wywołujemy odpowiednie kolejności 3 funkcji bazowych.
-#
 #
 # FUNKCJE BAZOWE:
 # Funkcja odczytaj_jednosci() powinna otrzymać tylko 1 znak odpowiadający rzędowi jedności
@@ -19,27 +21,30 @@
 #     - dla liczb 21-29,31-39,41-49,... -> slownik_dziesiatki + slownik_jednosci
 # Funkja odczytaj_setki() powinna otrzymać 1 znak odpowiadający rzędowi setek
 #
-#
-# PRZYKŁADOWY PRZEBIEG programu dla liczby 345111:
+# PRZYKŁADOWY PRZEBIEG programu dla liczby 345111.20:
 # 1. Pobranie liczby
-# 2. Sprawdzenie liczby
-#     - usunięcie wszystkich znaków białych
-#     - sprawdzenie czy użytkownik podał liczbę całkowitą
-#     - sprawdzenie poprawności zakresu [0 - 999999]
-# 3. Sprawdzenie długości liczby
-# 4. Dla liczby 6 cyfrowej, 345111:
-#     - dla 1. znaku odczytaj_setki()
-#     - dla 2. i 3. znaku odczytaj_dziesiatki()
-#         - wartość 45 czyli slownik_dziesiatki(4) + slownik_jednosci(5)
+# 2. Formatowanie liczby
+# 3. Sprawdzenie poprawności liczby
+# 4. Rozdzielenie liczby na zlotowki, grosze
+# 5. Sprawdzenie długości liczby złotówek
+# 6. Dla liczby 6 cyfrowej, 345111:
+#     - dla 1. znaku odczytaj_setki('3')
+#     - dla 2. i 3. znaku odczytaj_dziesiatki('45')
+#         - wartość 45 czyli slownik_dziesiatki('4') + slownik_jednosci('5')
 #     - dodaj slowo_tysiac()
-#     - dla 4. znaku odczytaj_setki()
-#     - dla 5. i 6. znaku odczytaj_dziesiatki
-#         - wartość 11 czyli slownik_kilkanascie(11)
-#     - dodaj slowo_zlotych()
+#     - dla 4. znaku odczytaj_setki('1')
+#     - dla 5. i 6. znaku odczytaj_dziesiatki('11')
+#         - wartość 11 czyli slownik_kilkanascie('11')
+#     - dodaj slowo_zlotych(zlotowki)
+# 7. Sprawdzenie długości liczby groszy
+# 8. Dla liczby 2 cyfrowej, 20:
+#     - dla 1. i 2. znaku odczytaj_dziesiatki('20')
+#         - wartość 20 czyli slownik_dziesiatki('20')
+#     - dodaj slowo_groszy(grosze)
 
-# #######################################
+# #############################################################################
 # Słowniki zawierają słowa kolejnych rzędów liczb
-def slownik_jednosci(x):
+def slownik_jednosci(x: str):
     a={ '0': 'zero ',
         '1': 'jeden ',
         '2': 'dwa ',
@@ -52,7 +57,7 @@ def slownik_jednosci(x):
         '9': 'dziewięć '}
     return a[x]
 
-def slownik_kilkanascie(x):
+def slownik_kilkanascie(x: str):
     a={ '11': 'jedenaście ',
         '12': 'dwanaście ',
         '13': 'trzynaście ',
@@ -64,7 +69,7 @@ def slownik_kilkanascie(x):
         '19': 'dziewiętnaście '}
     return a[x]
 
-def slownik_dziesiatek(x):
+def slownik_dziesiatek(x: str):
     a={ '1': 'dziesięć ',
         '2': 'dwadzieścia ',
         '3': 'trzydzieści ',
@@ -76,7 +81,7 @@ def slownik_dziesiatek(x):
         '9': 'dziewięćdziesiąt '}
     return a[x]
 
-def slownik_setek(x):
+def slownik_setek(x: str):
     a={ '0': '',
         '1': 'sto ',
         '2': 'dwieście ',
@@ -89,9 +94,11 @@ def slownik_setek(x):
         '9': 'dziewięćset '}
     return a[x]
 
-# #######################################
-# Funkcja dbająca o poprawną końcówkę słowa "złote"
-def slowo_zlotych(x):
+# #############################################################################
+def slowo_zlotych(x: str):
+    """
+    Funkcja dbająca o poprawną końcówkę słowa "złote".
+    """
     if int(x) < 10:
         zlote = {'0': 'złotych',
                 '1': 'złoty',
@@ -119,9 +126,41 @@ def slowo_zlotych(x):
                 '9': 'złotych'}
         return zlotych[x[-1]]
 
-# #######################################
-# Funkcja dbająca o poprawną końcówkę słowa "tysiąc"
-def slowo_tysiecy(x):
+def slowo_groszy(x: str):
+    """
+    Funkcja dbająca o poprawną końcówkę słowa "groszy".
+    """
+    if int(x) < 10:
+        grosze = {'0': 'groszy',
+                '1': 'grosz',
+                '2': 'grosze',
+                '3': 'grosze',
+                '4': 'grosze',
+                '5': 'groszy',
+                '6': 'groszy',
+                '7': 'groszy',
+                '8': 'groszy',
+                '9': 'groszy'}
+        return grosze[x[-1]]
+    elif 10 <= int(x) < 20:
+        return 'groszy'
+    elif int(x)>= 20:
+        grosze = {'0': 'groszy',
+                '1': 'groszy',
+                '2': 'grosze',
+                '3': 'grosze',
+                '4': 'grosze',
+                '5': 'groszy',
+                '6': 'groszy',
+                '7': 'groszy',
+                '8': 'groszy',
+                '9': 'groszy'}
+        return grosze[x[-1]]
+
+def slowo_tysiecy(x: str):
+    """
+    Funkcja dbająca o poprawną końcówkę słowa "tysiąc".
+    """
     if int(x) < 10:
         tysiac = {'0': 'tysięcy ',
                 '1': 'tysiąc ',
@@ -148,18 +187,21 @@ def slowo_tysiecy(x):
                 '8': 'tysięcy ',
                 '9': 'tysięcy '}
         return tysiac[x[-1]]
-# #######################################
+
+# #############################################################################
 # Funcje bazowe
-def odczytaj_jednosci(x):
+def odczytaj_jednosci(x: str):
     """
-    powinna otrzymać tylko 1 cyfrę odpowiadającą pozycji jedności,
-    przesyła ją do słownika i zwraca odpowiednie slowo
+    Powinna otrzymać tylko 1 cyfrę odpowiadającą pozycji jedności,
+    przesyła ją do słownika i zwraca odpowiednie slowo.
     """
     return slownik_jednosci(x)
 
-def odczytaj_dziesiatki(x):
-    """ powinna otrzymać 2 znaki odpowiadający pozycji dziesiątek i jedności,
-        przesyła 1 lub 2 do odpowiedniego słownika i zwraca odpowiednie slowo """
+def odczytaj_dziesiatki(x: str):
+    """
+    Powinna otrzymać 2 znaki odpowiadający pozycji dziesiątek i jedności,
+    przesyła 1 lub 2 do odpowiedniego słownika i zwraca odpowiednie slowo.
+    """
     if int(x) == 0:
         slowo = ''
     elif int(x) < 10:
@@ -173,70 +215,135 @@ def odczytaj_dziesiatki(x):
         slowo+=slownik_jednosci(x[1])
     return slowo
 
-def odczytaj_setki(x):
-    """ powinna otrzymać tylko 1 znak odpowiadający pozycji setek,
-        przesyła go do słownika i zwraca odpowiednie slowo """
+def odczytaj_setki(x: str):
+    """
+    Powinna otrzymać tylko 1 znak odpowiadający pozycji setek,
+    przesyła go do słownika i zwraca odpowiednie slowo.
+    """
     slowo=slownik_setek(x)
     return slowo
 
-# #######################################
-# Pobierz i sprawdź
-def pobierz_liczbe():
+# #############################################################################
+def przywitaj():
+    """
+    Funkcja witająca użytkownika.
+    """
+    wiadomosc = """Program zamieniający kwotę liczbową na słowną. Pełne nazewnictwo złotych i groszy.
+
+Można wpisywać:
+ 1234        1234
+1 234       1 234
+1 234.0     1 234,0
+1 234.7     1 234,7
+1 234.70    1 234,70
+1 234.706   1 234,706
+
+Zakres 0 - 999 999
+    """
+    print(wiadomosc)
+
+def pobierz_liczbe() -> str:
+    """
+    Pobiera liczbę od użytkownika.
+    """
     liczba=''
     while not liczba:
         liczba = input('Podaj liczbę:')
     return liczba
 
-def sprawdz_liczbe(x):
-    x = x.strip()
+def formatuj_liczbe(liczba: str) -> str:
+    """
+    Pozbywa się białych znaków z podanego przez użytkownika łańcucha znaków. Zamienia ',' na '.'
+    Przykład '1 234,56' -> '1234.56'
+    """
+    liczba = liczba.strip()
+    while ' ' in liczba:
+        liczba = liczba.replace(' ', '')
+    if ',' in liczba:
+        liczba = liczba.replace(',', '.')
+    return liczba
+
+def sprawdz_liczbe(liczba: str) -> bool:
+    """
+    Sprawdza czy liczba podana przez użytkownika jest rzeczywiście liczbą, np. czy nie zawiera liter.
+    Przykład '1234.56' -> True
+    Przykład '12$34a.56' -> False
+    """
     try:
-        int(x)
-        if int(x) < 0 or int(x) > 999999:
+        float(liczba)
+        if float(liczba) < 0 or float(liczba) > 999999:
             raise ValueError
         else:
-            return x
+            return True
     except ValueError:
-        print('liczba nieprawidłowa, konieczna wartość typu "intiger" z zakresu 0 - 999 999', end = '')
-        return None
+        print('liczba nieprawidłowa, konieczna liczba z zakresu 0 - 999 999', end = '')
+        return False
 
-# #######################################
+def rozdziel_liczbe(liczba: str):
+    """
+    Rozdziela liczbę na część całkowitą (złotówki) i zmiennoprzecinkową (grosze).
+    Przykład: liczba = '1234.56'-> zlotowki = '1234', grosze = '56'
+    """
+    liczba = float(liczba)
+    zlotowki = str(int(liczba)) # pozostawienie części całkowitej i konwersja na str -> '1234'
+    grosze = liczba % 1         # część zmiennoprzecinkowa, np 0.5599999999999454
+    grosze = str(int(round(grosze, 2) * 100)) # po zaokrągleniu i konwersji '56'
+    return zlotowki, grosze
+
+# #############################################################################
 # main
 def main():
+
+    przywitaj()
+
     while True:
-        liczba=pobierz_liczbe()
-        liczba=sprawdz_liczbe(liczba)
+        liczba = pobierz_liczbe()
+        liczba = formatuj_liczbe(liczba)
+        liczba_poprawna = sprawdz_liczbe(liczba)
 
         slowo=''
 
-        if liczba:
-            dlugosc = len(liczba)
+        if liczba_poprawna:
+            zlotowki, grosze = rozdziel_liczbe(liczba)
+
+            dlugosc = len(zlotowki)
             if dlugosc == 1:
-                slowo += odczytaj_jednosci(liczba)
+                slowo += odczytaj_jednosci(zlotowki)
             elif dlugosc == 2:
-                slowo += odczytaj_dziesiatki(liczba)
+                slowo += odczytaj_dziesiatki(zlotowki)
             elif dlugosc == 3:
-                slowo += odczytaj_setki(liczba[0])
-                slowo += odczytaj_dziesiatki(liczba[1:])
+                slowo += odczytaj_setki(zlotowki[0])
+                slowo += odczytaj_dziesiatki(zlotowki[1:])
             elif dlugosc == 4:
-                slowo += odczytaj_jednosci(liczba[0])
-                slowo += slowo_tysiecy(liczba[0])
-                slowo += odczytaj_setki(liczba[1])
-                slowo += odczytaj_dziesiatki(liczba[2:])
+                slowo += odczytaj_jednosci(zlotowki[0])
+                slowo += slowo_tysiecy(zlotowki[0])
+                slowo += odczytaj_setki(zlotowki[1])
+                slowo += odczytaj_dziesiatki(zlotowki[2:])
             elif dlugosc == 5:
-                slowo += odczytaj_dziesiatki(liczba[0:2])
-                slowo += slowo_tysiecy(liczba[0:2])
-                slowo += odczytaj_setki(liczba[2])
-                slowo += odczytaj_dziesiatki(liczba[3:])
+                slowo += odczytaj_dziesiatki(zlotowki[0:2])
+                slowo += slowo_tysiecy(zlotowki[0:2])
+                slowo += odczytaj_setki(zlotowki[2])
+                slowo += odczytaj_dziesiatki(zlotowki[3:])
             elif dlugosc == 6:
-                slowo += odczytaj_setki(liczba[0])
-                slowo += odczytaj_dziesiatki(liczba[1:3])
-                slowo += slowo_tysiecy(liczba[0:3])
-                slowo += odczytaj_setki(liczba[3])
-                slowo += odczytaj_dziesiatki(liczba[4:])
+                slowo += odczytaj_setki(zlotowki[0])
+                slowo += odczytaj_dziesiatki(zlotowki[1:3])
+                slowo += slowo_tysiecy(zlotowki[0:3])
+                slowo += odczytaj_setki(zlotowki[3])
+                slowo += odczytaj_dziesiatki(zlotowki[4:])
 
             # dodaj końcówkę 'złotych' w odpowiedniej formie
-            slowo += slowo_zlotych(liczba)
+            slowo += slowo_zlotych(zlotowki)
+            slowo += ' '
+
+            dlugosc = len(grosze)
+            if dlugosc == 1:
+                slowo += odczytaj_jednosci(grosze)
+            elif dlugosc == 2:
+                slowo += odczytaj_dziesiatki(grosze)
+            # dodaj końcówkę 'złotych' w odpowiedniej formie
+            slowo += slowo_groszy(grosze)
 
         print(slowo)
 
-main()
+if __name__ == "__main__":
+    main()
