@@ -3,7 +3,7 @@
 #
 # Autor: Krzysztof Karch 
 # Mail:  krzysztof.karch@wp.pl
-# Modyfikacja: 07.07.2021
+# Modyfikacja: 08.07.2021
 #
 # OPIS
 # Liczby składają się z rzędów jedności, dziesiątek i setek. Rząd tysiąca (lub dziesiątek tysięcy) traktujemy 
@@ -162,7 +162,7 @@ def slowo_tysiecy(x: str):
     Funkcja dbająca o poprawną końcówkę słowa "tysiąc".
     """
     if int(x) < 10:
-        tysiecy = {'0': 'tysięcy ',
+        tysiecy = {'0': '',
                 '1': 'tysiąc ',
                 '2': 'tysiące ',
                 '3': 'tysiące ',
@@ -176,7 +176,7 @@ def slowo_tysiecy(x: str):
     elif 10 <= int(x) < 20:
         return 'tysięcy '
     elif int(x) >= 20:
-        tysiecy = {'0': 'tysięcy',
+        tysiecy = {'0': 'tysięcy ',
                 '1': 'tysięcy',
                 '2': 'tysiące ',
                 '3': 'tysiące ',
@@ -193,7 +193,7 @@ def slowo_milionow(x: str):
     Funkcja dbająca o poprawną końcówkę słowa "milion".
     """
     if int(x) < 10:
-        milionow = {'0': 'milionów ',
+        milionow = {'0': '',
                 '1': 'milion ',
                 '2': 'miliony ',
                 '3': 'miliony ',
@@ -318,8 +318,83 @@ def rozdziel_liczbe(liczba: str):
     liczba = float(liczba)
     zlotowki = str(int(liczba)) # pozostawienie części całkowitej i konwersja na str -> '1234'
     grosze = liczba % 1         # część zmiennoprzecinkowa, np 0.5599999999999454
-    grosze = str(int(round(grosze, 2) * 100)) # po zaokrągleniu i konwersji '56'
+    grosze = round(grosze * 100)# pomnóż i zaokrąglij do 56
+    grosze = str(grosze)        # konwersja na '56'
     return zlotowki, grosze
+
+def slownie_zlotych(liczba: str):
+    """
+    Zwraca łańcuch znakowy będący słowną reprezentacją liczby złotych.
+    """
+    kwota = ''
+    dlugosc = len(liczba)
+    if dlugosc == 1:
+        kwota += odczytaj_jednosci(liczba)
+    elif dlugosc == 2:
+        kwota += odczytaj_dziesiatki(liczba)
+    elif dlugosc == 3:
+        kwota += odczytaj_setki(liczba[0])
+        kwota += odczytaj_dziesiatki(liczba[1:])
+    elif dlugosc == 4:
+        kwota += odczytaj_jednosci(liczba[0])
+        kwota += slowo_tysiecy(liczba[0])
+        kwota += odczytaj_setki(liczba[1])
+        kwota += odczytaj_dziesiatki(liczba[2:])
+    elif dlugosc == 5:
+        kwota += odczytaj_dziesiatki(liczba[0:2])
+        kwota += slowo_tysiecy(liczba[0:2])
+        kwota += odczytaj_setki(liczba[2])
+        kwota += odczytaj_dziesiatki(liczba[3:])
+    elif dlugosc == 6:
+        kwota += odczytaj_setki(liczba[0])
+        kwota += odczytaj_dziesiatki(liczba[1:3])
+        kwota += slowo_tysiecy(liczba[0:3])
+        kwota += odczytaj_setki(liczba[3])
+        kwota += odczytaj_dziesiatki(liczba[4:])
+    elif dlugosc == 7:
+        kwota += odczytaj_jednosci(liczba[0])
+        kwota += slowo_milionow(liczba[0])
+        kwota += odczytaj_setki(liczba[1])
+        kwota += odczytaj_dziesiatki(liczba[2:4])
+        kwota += slowo_tysiecy(liczba[1:4])
+        kwota += odczytaj_setki(liczba[4])
+        kwota += odczytaj_dziesiatki(liczba[5:])
+    elif dlugosc == 8:
+        kwota += odczytaj_dziesiatki(liczba[0:2])
+        kwota += slowo_milionow(liczba[0:2])
+        kwota += odczytaj_setki(liczba[2])
+        kwota += odczytaj_dziesiatki(liczba[3:5])
+        kwota += slowo_tysiecy(liczba[2:5])
+        kwota += odczytaj_setki(liczba[5])
+        kwota += odczytaj_dziesiatki(liczba[6:])
+    elif dlugosc == 9:
+        kwota += odczytaj_setki(liczba[0])
+        kwota += odczytaj_dziesiatki(liczba[1:3])
+        kwota += slowo_milionow(liczba[0:3])
+        kwota += odczytaj_setki(liczba[3])
+        kwota += odczytaj_dziesiatki(liczba[4:6])
+        kwota += slowo_tysiecy(liczba[3:6])
+        kwota += odczytaj_setki(liczba[6])
+        kwota += odczytaj_dziesiatki(liczba[7:])
+
+    # dodaj końcówkę 'złotych' w odpowiedniej formie
+    kwota += slowo_zlotych(liczba)
+    return kwota
+
+def slownie_groszy(liczba: str):
+    """
+    Zwraca łańcuch znakowy będący słowną reprezentacją liczby groszy.
+    Przykład: liczba = '15' -> 'piętnaście groszy'
+    """
+    dlugosc = len(liczba)
+    if dlugosc == 1:
+        kwota = odczytaj_jednosci(liczba)
+    elif dlugosc == 2:
+        kwota = odczytaj_dziesiatki(liczba)
+
+    # dodaj końcówkę 'groszy' w odpowiedniej formie
+    kwota += slowo_groszy(liczba)
+    return kwota
 
 # #############################################################################
 # main
@@ -332,75 +407,16 @@ def main():
         liczba = formatuj_liczbe(liczba)
         liczba_poprawna = sprawdz_liczbe(liczba)
 
-        slowo=''
-
         if liczba_poprawna:
             zlotowki, grosze = rozdziel_liczbe(liczba)
 
             # tworzenie słownej kwoty złotych
-            dlugosc = len(zlotowki)
-            if dlugosc == 1:
-                slowo += odczytaj_jednosci(zlotowki)
-            elif dlugosc == 2:
-                slowo += odczytaj_dziesiatki(zlotowki)
-            elif dlugosc == 3:
-                slowo += odczytaj_setki(zlotowki[0])
-                slowo += odczytaj_dziesiatki(zlotowki[1:])
-            elif dlugosc == 4:
-                slowo += odczytaj_jednosci(zlotowki[0])
-                slowo += slowo_tysiecy(zlotowki[0])
-                slowo += odczytaj_setki(zlotowki[1])
-                slowo += odczytaj_dziesiatki(zlotowki[2:])
-            elif dlugosc == 5:
-                slowo += odczytaj_dziesiatki(zlotowki[0:2])
-                slowo += slowo_tysiecy(zlotowki[0:2])
-                slowo += odczytaj_setki(zlotowki[2])
-                slowo += odczytaj_dziesiatki(zlotowki[3:])
-            elif dlugosc == 6:
-                slowo += odczytaj_setki(zlotowki[0])
-                slowo += odczytaj_dziesiatki(zlotowki[1:3])
-                slowo += slowo_tysiecy(zlotowki[0:3])
-                slowo += odczytaj_setki(zlotowki[3])
-                slowo += odczytaj_dziesiatki(zlotowki[4:])
-            elif dlugosc == 7:
-                slowo += odczytaj_jednosci(zlotowki[0])
-                slowo += slowo_milionow(zlotowki[0])
-                slowo += odczytaj_setki(zlotowki[1])
-                slowo += odczytaj_dziesiatki(zlotowki[2:4])
-                slowo += slowo_tysiecy(zlotowki[1:4])
-                slowo += odczytaj_setki(zlotowki[4])
-                slowo += odczytaj_dziesiatki(zlotowki[5:])
-            elif dlugosc == 8:
-                slowo += odczytaj_dziesiatki(zlotowki[0:2])
-                slowo += slowo_milionow(zlotowki[0:2])
-                slowo += odczytaj_setki(zlotowki[2])
-                slowo += odczytaj_dziesiatki(zlotowki[3:5])
-                slowo += slowo_tysiecy(zlotowki[2:5])
-                slowo += odczytaj_setki(zlotowki[5])
-                slowo += odczytaj_dziesiatki(zlotowki[6:])
-            elif dlugosc == 9:
-                slowo += odczytaj_setki(zlotowki[0])
-                slowo += odczytaj_dziesiatki(zlotowki[1:3])
-                slowo += slowo_milionow(zlotowki[0:3])
-                slowo += odczytaj_setki(zlotowki[3])
-                slowo += odczytaj_dziesiatki(zlotowki[4:6])
-                slowo += slowo_tysiecy(zlotowki[3:6])
-                slowo += odczytaj_setki(zlotowki[6])
-                slowo += odczytaj_dziesiatki(zlotowki[7:])
-
-            # dodaj końcówkę 'złotych' w odpowiedniej formie
-            slowo += slowo_zlotych(zlotowki)
+            slowo = ''
+            slowo += slownie_zlotych(zlotowki)
 
             # tworzenie słownej kwoty groszy
             slowo += ' '
-            dlugosc = len(grosze)
-            if dlugosc == 1:
-                slowo += odczytaj_jednosci(grosze)
-            elif dlugosc == 2:
-                slowo += odczytaj_dziesiatki(grosze)
-
-            # dodaj końcówkę 'groszy' w odpowiedniej formie
-            slowo += slowo_groszy(grosze)
+            slowo += slownie_groszy(grosze)
 
         print(slowo)
 
