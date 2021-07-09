@@ -133,6 +133,10 @@ class NamesTestCase(unittest.TestCase):
         """Czy liczba w postaci '1234.567' jest prawidłowo rozdzielana?"""
         self.assertEqual(kwota.rozdziel_liczbe('1234.567'), ('1234', '57'))
 
+    def test_rozdziel_liczbe06(self):
+        """Czy liczba w postaci '9.9999' jest prawidłowo rozdzielana?"""
+        self.assertEqual(kwota.rozdziel_liczbe('9.9999'), ('10', '0'))
+
     def test_slownie_zlotych01(self):
         """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
         self.assertEqual(kwota.slownie_zlotych('0'),
@@ -254,6 +258,26 @@ class NamesTestCase(unittest.TestCase):
         self.assertEqual(kwota.slownie_zlotych('999999999'),
             'dziewięćset dziewięćdziesiąt dziewięć milionów dziewięćset dziewięćdziesiąt' 
             + ' dziewięć tysięcy dziewięćset dziewięćdziesiąt dziewięć złotych')
+
+    def test_slownie_zlotych25(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('3212'),
+            'trzy tysiące dwieście dwanaście złotych')
+
+    def test_slownie_zlotych26(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('3222'),
+            'trzy tysiące dwieście dwadzieścia dwa złote')
+
+    def test_slownie_zlotych27(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('100000000'),
+            'sto milionów złotych')
+
+    def test_slownie_zlotych28(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('100001000'),
+            'sto milionów jeden tysiąc złotych')
 
     def test_slownie_groszy01(self):
         """Czy liczba '0' jest prawidłowo zamieniana?"""

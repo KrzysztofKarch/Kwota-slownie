@@ -1,4 +1,4 @@
-# Program do zamiany liczby zapisanej za pomocą cyfr z zakresu [0 - 999 999 999] 
+# Program do zamiany liczby zapisanej za pomocą cyfr z zakresu [0 - 999 999 999.99] 
 # na liczbę zapisaną słownie. Pełne nazewnictwo złotych i groszy. 
 #
 # Autor: Krzysztof Karch 
@@ -99,6 +99,9 @@ def slowo_zlotych(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "złote".
     """
+    # o poprawnej odmianie decydują 2 ostatnie cyfry
+    if len(x) >= 3:
+        x = x[-2:]
     if int(x) < 10:
         zlotych = {'0': 'złotych',
                 '1': 'złoty',
@@ -141,7 +144,7 @@ def slowo_groszy(x: str):
                 '7': 'groszy',
                 '8': 'groszy',
                 '9': 'groszy'}
-        return groszy[x[-1]]
+        return groszy[x[0]]
     elif 10 <= int(x) < 20:
         return 'groszy'
     elif int(x)>= 20:
@@ -161,8 +164,14 @@ def slowo_tysiecy(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "tysiąc".
     """
+    # przypadek szczególny słowo może zawierać pełne miliony
+    if int(x) == 0:
+        return ''
+    # o poprawnej odmianie decydują 2 ostatnie cyfry
+    if len(x) >= 3:
+        x = x[-2:]
     if int(x) < 10:
-        tysiecy = {'0': '',
+        tysiecy = {'0': 'tysięcy ',
                 '1': 'tysiąc ',
                 '2': 'tysiące ',
                 '3': 'tysiące ',
@@ -192,8 +201,11 @@ def slowo_milionow(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "milion".
     """
+    # o poprawnej odmianie decydują 2 ostatnie cyfry
+    if len(x) >= 3:
+        x = x[-2:]
     if int(x) < 10:
-        milionow = {'0': '',
+        milionow = {'0': 'milionów ',
                 '1': 'milion ',
                 '2': 'miliony ',
                 '3': 'miliony ',
@@ -236,14 +248,14 @@ def odczytaj_dziesiatki(x: str):
     if int(x) == 0:                     # 0
         slowo = ''
     elif int(x) < 10:                   # 1,2,3,4,5,6,7,8,9
-        slowo=slownik_jednosci(x[1])
-    elif int(x) > 10 and int(x) < 20:   # 11,12,13,14,15,16,17,18,19
-        slowo=slownik_kilkanascie(x)
+        slowo = slownik_jednosci(x[1])
+    elif 10 < int(x) < 20:              # 11,12,13,14,15,16,17,18,19
+        slowo = slownik_kilkanascie(x)
     elif int(x) % 10 == 0:              # 10,20,30,40,50,60,70,80,90
-        slowo=slownik_dziesiatek(x[0])
+        slowo = slownik_dziesiatek(x[0])
     else:                               # 21+
-        slowo=slownik_dziesiatek(x[0])
-        slowo+=slownik_jednosci(x[1])
+        slowo = slownik_dziesiatek(x[0])
+        slowo += slownik_jednosci(x[1])
     return slowo
 
 def odczytaj_setki(x: str):
@@ -251,8 +263,7 @@ def odczytaj_setki(x: str):
     Powinna otrzymać tylko 1 znak odpowiadający pozycji setek,
     przesyła go do słownika i zwraca odpowiednie slowo.
     """
-    slowo=slownik_setek(x)
-    return slowo
+    return slownik_setek(x)
 
 # #############################################################################
 def przywitaj():
@@ -269,7 +280,7 @@ Można wpisywać:
 1 234.70    1 234,70
 1 234.706   1 234,706
 
-Zakres 0 - 999 999 999
+Zakres 0 - 999 999 999.99
     """
     print(wiadomosc)
 
@@ -302,25 +313,28 @@ def sprawdz_liczbe(liczba: str) -> bool:
     """
     try:
         float(liczba)
-        if float(liczba) < 0 or float(liczba) > 999999999:
+        if float(liczba) < 0 or float(liczba) >= 999999999.995:
             raise ValueError
         else:
             return True
     except ValueError:
-        print('liczba nieprawidłowa, konieczna liczba z zakresu 0 - 999 999 999', end = '')
+        print('liczba nieprawidłowa, konieczna liczba z zakresu 0 - 999 999 999.99', end = '')
         return False
 
 def rozdziel_liczbe(liczba: str):
     """
     Rozdziela liczbę na część całkowitą (złotówki) i zmiennoprzecinkową (grosze).
     Przykład: liczba = '1234.56'-> zlotowki = '1234', grosze = '56'
+    Przykład: liczba = '1234.996'-> zlotowki = '1235', grosze = '0'
     """
     liczba = float(liczba)
-    zlotowki = str(int(liczba)) # pozostawienie części całkowitej i konwersja na str -> '1234'
-    grosze = liczba % 1         # część zmiennoprzecinkowa, np 0.5599999999999454
-    grosze = round(grosze * 100)# pomnóż i zaokrąglij do 56
-    grosze = str(grosze)        # konwersja na '56'
-    return zlotowki, grosze
+    zlotowki = int(liczba)       # pozostawienie części całkowitej
+    grosze = liczba % 1          # część zmiennoprzecinkowa, np 0.5599999999999454
+    grosze = round(grosze * 100) # pomnóż i zaokrąglij do 56
+    if grosze == 100:
+        zlotowki += 1
+        grosze = 0
+    return str(zlotowki), str(grosze)
 
 def slownie_zlotych(liczba: str):
     """
@@ -406,6 +420,7 @@ def main():
         liczba = pobierz_liczbe()
         liczba = formatuj_liczbe(liczba)
         liczba_poprawna = sprawdz_liczbe(liczba)
+        slowo = ''
 
         if liczba_poprawna:
             zlotowki, grosze = rozdziel_liczbe(liczba)
