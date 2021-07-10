@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<!--
+Program do zamiany liczby zapisanej za pomocą cyfr z zakresu [0 - 999 999 999.99] 
+na liczbę zapisaną słownie. Pełne nazewnictwo złotych i groszy. 
+
+Autor: Krzysztof Karch 
+Mail:  krzysztof.karch@wp.pl
+Modyfikacja: 08.07.2021
+-->
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Kwota słownie</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam&display=swap" rel="stylesheet"> 
+    <style type="text/css">
+        body {
+            font-size: 18px;
+            background-color: rgb(240, 228, 181);
+            font-family: Courier New;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+        .show {
+            display: block;
+        }
+        .hide {
+            visibility: hidden;
+        }
+        #main {
+            min-width: 700px;
+            max-width: 700px;
+            margin: 30px auto;
+            background-color: rgb(138, 171, 131);
+            border: 4px solid rgb(193, 210, 189);
+            border-radius: 16px;
+        }
+        #main:hover {
+            box-shadow: 4px 4px 18px rgb(193, 210, 189);
+        }
+        #main h1 {
+            text-align: center;
+            font-family: 'Kalam', cursive;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+            margin-top: 10px;
+            margin-bottom: 0px;
+            text-shadow: 1px 1px gray;
+        }
+        #main p {
+            text-align: center;
+            margin: 0px 45px;
+            padding: 4px;
+            color: rgb(20, 20, 20);
+            border-top: 1px solid rgb(80, 80, 80);
+            border-bottom: 1px solid rgb(80, 80, 80);
+        }
+        #main #tooltip {
+            margin: 10px 5px 10px 20px;
+            padding: 0px 8px;
+            font-size: 1.1em;
+            color: darkblue;        }
+        #main #tooltip #tooltiptext {
+            text-align: left;
+            visibility: hidden;
+            background-color: beige;
+            width: 300px;
+            top: 210px;
+            margin-left: -60px;
+            position: absolute;
+            z-index: 1;
+            padding: 0px 20px;
+            opacity: 0;
+            transition: opacity 0.6s;
+            box-shadow: 2px 2px 4px black;
+        }
+        #main #tooltip:hover #tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        #main label {
+        }
+        #main #liczba_uzytkownika {
+            margin-left: 20px;
+            margin-right: 8px;
+            padding: 6px;
+            font-size: 1.1em;
+            width: 575px;
+        }
+        #main #kasuj {
+            padding: 6px 14px;
+            font-size: 20px;
+            box-shadow: 1px 1px 1px black;
+            color: red;
+        }
+        #main #wiadomosc {
+            margin: 5px 0px 5px 20px;
+            color: red;
+            font-family: Courier New;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+        #main textarea {
+            margin: 5px 0px 5px 20px;
+            resize: none;
+            width: 650px;
+            height: 100px;
+            font-size: 1.1em;
+            font-family: Courier New;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+        #main #kopiuj {
+            display: flex;
+            align-items: center;
+            margin: 5px auto 20px auto;
+            padding: 6px 80px 6px 80px;
+            font-size: 1em;
+            font-family: Courier New;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            /* ukryj */
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="main">
+    <h1>kwota słownie</h1>
+    <p>Program zamienia kwotę liczbową na słowną. <br>Pełne nazewnictwo złotych i groszy. </p>
+    <button id="tooltip">?
+        <span id="tooltiptext">
+<pre>
+Można wpisywać:
+ 1234        1234
+1 234       1 234
+1 234.0     1 234,0
+1 234.7     1 234,7
+1 234.70    1 234,70
+1 234.706   1 234,706
+
+Zakres 0 - 999 999 999.99
+</pre>
+        </span>
+    </button>
+    <label for="liczba_uzytkownika">Wpisz liczbę:</label><br>
+    <input type="text" id="liczba_uzytkownika" name="liczba_uzytkownika" placeholder="12 345,67" autofocus/>
+    <button id="kasuj">X</button>
+    <div id="wiadomosc">&nbsp</div>
+    <textarea id="wynik" readonly></textarea><br>
+    <button id="kopiuj">kopiuj</button>
+</div>
+
+
+<script type="text/javascript">
+    //#########################################################################
+    // Słowniki zawierają słowa kolejnych rzędów liczb
+    function slownik_jednosci(x) {
+        let a = {
+            '0': 'zero ',
+            '1': 'jeden ',
+            '2': 'dwa ',
+            '3': 'trzy ',
+            '4': 'cztery ',
+            '5': 'pięć ',
+            '6': 'sześć ',
+            '7': 'siedem ',
+            '8': 'osiem ',
+            '9': 'dziewięć '};
+        return a[x];
+    };
+    function slownik_kilkanascie(x) {
+        let a = {
+            '11': 'jedenaście ',
+            '12': 'dwanaście ',
+            '13': 'trzynaście ',
+            '14': 'czternaście ',
+            '15': 'piętnaście ',
+            '16': 'szesnaście ',
+            '17': 'siedemnaście ',
+            '18': 'osiemnaście ',
+            '19': 'dziewiętnaście '};
+        return a[x];
+    };
+    function slownik_dziesiatek(x) {
+        let a = {
+            '1': 'dziesięć ',
+            '2': 'dwadzieścia ',
+            '3': 'trzydzieści ',
+            '4': 'czterdzieści ',
+            '5': 'pięćdziesiąt ',
+            '6': 'sześćdziesiąt ',
+            '7': 'siedemdziesiąt ',
+            '8': 'osiemdziesiąt ',
+            '9': 'dziewięćdziesiąt '}
+        return a[x];
+    };
+    function slownik_setek(x) {
+        let a = {
+            '0': '',
+            '1': 'sto ',
+            '2': 'dwieście ',
+            '3': 'trzysta ',
+            '4': 'czterysta ',
+            '5': 'pięćset ',
+            '6': 'sześćset ',
+            '7': 'siedemset ',
+            '8': 'osiemset ',
+            '9': 'dziewięćset '}
+        return a[x];
+    };
+    //#########################################################################
+    function slowo_zlotych(x) {
+        // Funkcja dbająca o poprawną końcówkę słowa "złote".
+        // obsługa 3 i więcej cyfr
+        if (x.length >= 3) {
+            if (x.substring(x.length - 2) === '01') {
+                return 'złotych';
+            } else {
+                x = x.substring(x.length - 2);
+            };
+        };
+        // obsługa 2 cyfr
+        if (Number(x) < 10) {
+            let zlotych = {'0': 'złotych',
+                    '1': 'złoty',
+                    '2': 'złote',
+                    '3': 'złote',
+                    '4': 'złote',
+                    '5': 'złotych',
+                    '6': 'złotych',
+                    '7': 'złotych',
+                    '8': 'złotych',
+                    '9': 'złotych'};
+            return zlotych[x[x.length - 1]];
+        } else if (10 <= Number(x) && Number(x) < 20) {
+            return 'złotych';
+        } else if (Number(x) >= 20) {
+            let zlotych = {'0': 'złotych',
+                '1': 'złotych',
+                '2': 'złote',
+                '3': 'złote',
+                '4': 'złote',
+                '5': 'złotych',
+                '6': 'złotych',
+                '7': 'złotych',
+                '8': 'złotych',
+                '9': 'złotych'};
+            return zlotych[x[x.length - 1]];
+        };
+    };
+    function slowo_groszy(x) {
+        // Funkcja dbająca o poprawną końcówkę słowa "groszy".
+        if (Number(x) < 10) {
+            let groszy = {'0': 'groszy',
+                '1': 'grosz',
+                '2': 'grosze',
+                '3': 'grosze',
+                '4': 'grosze',
+                '5': 'groszy',
+                '6': 'groszy',
+                '7': 'groszy',
+                '8': 'groszy',
+                '9': 'groszy'};
+            return groszy[x[0]];
+        } else if (10 <= Number(x) && Number(x) < 20) {
+            return 'groszy';
+        } else if (Number(x) >= 20) {
+            let groszy = {'0': 'groszy',
+                '1': 'groszy',
+                '2': 'grosze',
+                '3': 'grosze',
+                '4': 'grosze',
+                '5': 'groszy',
+                '6': 'groszy',
+                '7': 'groszy',
+                '8': 'groszy',
+                '9': 'groszy'};
+            return groszy[x[x.length - 1]];
+        };
+    };
+    function slowo_tysiecy(x) {
+        // Funkcja dbająca o poprawną końcówkę słowa "tysiąc".
+        // obsługa 3 cyfr
+        if (x.length === 3) {
+            if (x === '000') {
+                return '';
+            } else if (x === '001') {
+                return 'tysiąc ';
+            } else if (x.substring(x.length - 2) === '01') {
+                return 'tysięcy '
+            } else {
+                x = x.substring(x.length - 2);
+            };
+        };
+        // obsługa 2 cyfr
+        if (Number(x) < 10) {
+            let tysiecy = {'0': 'tysięcy ',
+                '1': 'tysiąc ',
+                '2': 'tysiące ',
+                '3': 'tysiące ',
+                '4': 'tysiące ',
+                '5': 'tysięcy ',
+                '6': 'tysięcy ',
+                '7': 'tysięcy ',
+                '8': 'tysięcy ',
+                '9': 'tysięcy '};
+            return tysiecy[x[x.length - 1]];
+        } else if (10 <= Number(x) && Number(x) < 20) {
+            return 'tysięcy ';
+        } else if (Number(x) >= 20) {
+            let tysiecy = {'0': 'tysięcy ',
+                '1': 'tysięcy',
+                '2': 'tysiące ',
+                '3': 'tysiące ',
+                '4': 'tysiące ',
+                '5': 'tysięcy ',
+                '6': 'tysięcy ',
+                '7': 'tysięcy ',
+                '8': 'tysięcy ',
+                '9': 'tysięcy '};
+            return tysiecy[x[x.length - 1]];
+        };
+    };
+    function slowo_milionow(x) {
+        //Funkcja dbająca o poprawną końcówkę słowa "milion".
+        // obsługa 3 i więcej cyfr
+        if (x.length >= 3) {
+            if (x.substring(x.length - 2) === '01') {
+                return 'milionów ';
+            } else {
+                x = x.substring(x.length - 2);
+            };
+        };
+        // obsługa 2 cyfr
+        if (Number(x) < 10) {
+            let milionow = {'0': 'milionów ',
+                '1': 'milion ',
+                '2': 'miliony ',
+                '3': 'miliony ',
+                '4': 'miliony ',
+                '5': 'milionów ',
+                '6': 'milionów ',
+                '7': 'milionów ',
+                '8': 'milionów ',
+                '9': 'milionów '};
+            return milionow[x[x.length - 1]];
+        } else if (10 <= Number(x) && Number(x) < 20) {
+            return 'milionów ';
+        } else if (Number(x) >= 20) {
+            let milionow = {'0': 'milionów ',
+                '1': 'milionów ',
+                '2': 'miliony ',
+                '3': 'miliony ',
+                '4': 'miliony ',
+                '5': 'milionów ',
+                '6': 'milionów ',
+                '7': 'milionów ',
+                '8': 'milionów ',
+                '9': 'milionów '};
+            return milionow[x[x.length - 1]];
+        };
+    };
+    //#########################################################################
+    // Funkcje bazowe
+    function odczytaj_jednosci(x) {
+        // Powinna otrzymać tylko 1 cyfrę odpowiadającą pozycji jedności,
+        // przesyła ją do słownika i zwraca odpowiednie slowo.
+        return slownik_jednosci(x);
+    };
+    function odczytaj_dziesiatki(x) {
+        // Powinna otrzymać 2 znaki odpowiadające pozycji dziesiątek i jedności,
+        // przesyła znaki do odpowiedniego słownika i zwraca odpowiednie slowo.
+        let slowo;
+        if (Number(x) == 0) {                          // 0
+            slowo = '';
+        } else if (Number(x) < 10) {                   // 1,2,3,4,5,6,7,8,9
+            slowo = slownik_jednosci(x[1]);
+        } else if (10 < Number(x) && Number(x) < 20) { // 11,12,13,14,15,16,17,18,19
+            slowo = slownik_kilkanascie(x);
+        } else if (Number(x) % 10 == 0) {              // 10,20,30,40,50,60,70,80,90
+            slowo = slownik_dziesiatek(x[0]);
+        } else {                                       // 21+
+            slowo = slownik_dziesiatek(x[0]);
+            slowo += slownik_jednosci(x[1]);
+        };
+        return slowo;
+    };
+    function odczytaj_setki(x) {
+        // Powinna otrzymać tylko 1 znak odpowiadający pozycji setek,
+        // przesyła go do słownika i zwraca odpowiednie slowo.
+        return slownik_setek(x);
+    };
+    //#########################################################################
+    function formatuj_liczbe(liczba) {
+        // Pozbywa się białych znaków z podanego łańcucha znaków. Zamienia ',' na '.'
+        // Przykład '1 234,56' -> '1234.56'
+        liczba = liczba.trim();
+        while (liczba.indexOf(' ') > -1) {
+            liczba = liczba.replace(' ', '');
+        };
+        if (liczba.indexOf(',') > -1) {
+            liczba = liczba.replace(',', '.');
+        };
+        return liczba;
+    };
+    function sprawdz_liczbe(liczba) {
+    // Sprawdza czy liczba podana przez użytkownika jest rzeczywiście liczbą, 
+    // np. czy nie zawiera liter albo wykracza poza zakres.
+    // Przykład '1234.56' -> true
+    // Przykład '12$34a.56' -> false
+    // Przykład '0' -> true
+    // Przykład '' -> false
+        if (liczba === '' || liczba === ' ') {
+            return false;
+        } else {
+            if (Number(liczba) === 0) {
+                return true;
+            };
+            liczba = Number(liczba);
+            if (Boolean(liczba) && liczba >= 0 && liczba < 999999999.995) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+    };
+    function rozdziel_liczbe(liczba) {
+    // Rozdziela liczbę na część całkowitą (złotówki) i zmiennoprzecinkową (grosze).
+    // Przykład: liczba = '1234.56'-> zlotowki = '1234', grosze = '56'
+        liczba = Number(liczba);
+        let zlotowki = Math.floor(liczba); // '1234.56' -> '1234'
+        let grosze = liczba % 1;       // część zmiennoprzecinkowa, np. 0.5599999999999454
+        grosze = Math.round(grosze * 100);  // pomnóż i zaokrąglij do 56
+        if (grosze === 100) {
+            zlotowki += 1;
+            grosze = 0
+        };
+        return [String(zlotowki), String(grosze)];
+    };
+
+    function slownie_zlotych(liczba) {
+        // Zwraca łańcuch znakowy będący słowną reprezentacją liczby złotych.
+        let kwota = '';
+        let dlugosc = liczba.length;
+        if (dlugosc === 1) {
+            kwota += odczytaj_jednosci(liczba);
+        } else if (dlugosc === 2) {
+            kwota += odczytaj_dziesiatki(liczba);
+        } else if (dlugosc === 3) {
+            kwota += odczytaj_setki(liczba[0]);
+            kwota += odczytaj_dziesiatki(liczba.substring(1));
+        } else if (dlugosc === 4) {
+            kwota += odczytaj_jednosci(liczba[0]);
+            kwota += slowo_tysiecy(liczba[0]);
+            kwota += odczytaj_setki(liczba[1]);
+            kwota += odczytaj_dziesiatki(liczba.substring(2));
+        } else if (dlugosc === 5) {
+            kwota += odczytaj_dziesiatki(liczba.substring(0, 2));
+            kwota += slowo_tysiecy(liczba.substring(0, 2));
+            kwota += odczytaj_setki(liczba[2]);
+            kwota += odczytaj_dziesiatki(liczba.substring(3));
+        } else if (dlugosc === 6) {
+            kwota += odczytaj_setki(liczba[0]);
+            kwota += odczytaj_dziesiatki(liczba.substring(1, 3));
+            kwota += slowo_tysiecy(liczba.substring(0, 3));
+            kwota += odczytaj_setki(liczba[3]);
+            kwota += odczytaj_dziesiatki(liczba.substring(4));
+        } else if (dlugosc === 7) {
+            kwota += odczytaj_jednosci(liczba[0]);
+            kwota += slowo_milionow(liczba[0]);
+            kwota += odczytaj_setki(liczba[1]);
+            kwota += odczytaj_dziesiatki(liczba.substring(2, 4));
+            kwota += slowo_tysiecy(liczba.substring(1, 4));
+            kwota += odczytaj_setki(liczba[4]);
+            kwota += odczytaj_dziesiatki(liczba.substring(5));
+        } else if (dlugosc === 8) {
+            kwota += odczytaj_dziesiatki(liczba.substring(0, 2));
+            kwota += slowo_milionow(liczba.substring(0, 2));
+            kwota += odczytaj_setki(liczba[2]);
+            kwota += odczytaj_dziesiatki(liczba.substring(3, 5));
+            kwota += slowo_tysiecy(liczba.substring(2, 5));
+            kwota += odczytaj_setki(liczba[5]);
+            kwota += odczytaj_dziesiatki(liczba.substring(6));
+        }  else if (dlugosc === 9) {
+            kwota += odczytaj_setki(liczba[0]);
+            kwota += odczytaj_dziesiatki(liczba.substring(1, 3));
+            kwota += slowo_milionow(liczba.substring(0, 3));
+            kwota += odczytaj_setki(liczba[3]);
+            kwota += odczytaj_dziesiatki(liczba.substring(4, 6));
+            kwota += slowo_tysiecy(liczba.substring(3, 6));
+            kwota += odczytaj_setki(liczba[6]);
+            kwota += odczytaj_dziesiatki(liczba.substring(7));
+        };
+        // dodaj końcówkę 'złotych' w odpowiedniej formie
+        kwota += slowo_zlotych(liczba);
+        return kwota;
+    };
+    function slownie_groszy(liczba) {
+        // Zwraca łańcuch znakowy będący słowną reprezentacją liczby groszy.
+        // Przykład: liczba = '15' -> 'piętnaście groszy'
+        let dlugosc = liczba.length;
+        let kwota;
+        if (dlugosc === 1) {
+            kwota = odczytaj_jednosci(liczba);
+        } else if (dlugosc === 2) {
+            kwota = odczytaj_dziesiatki(liczba);
+        };
+        // dodaj końcówkę 'groszy' w odpowiedniej formie
+        kwota += slowo_groszy(liczba);
+        return kwota;
+    };
+    function wyczysc_liczbe() {
+        // sprzątanie po naciśnięciu przez użytkownika 'X' do kasowania
+        document.getElementById('liczba_uzytkownika').value = '';
+        document.getElementById('wynik').value = '';
+        document.getElementById('wiadomosc').className = 'hide';
+        document.getElementById('liczba_uzytkownika').focus();
+    };
+    function tworz_kwote_slownie() {
+        // main
+        // tworzenie pełnej, słownej reprezentacji kwoty podanej przez użytkownika
+        let liczba = document.getElementById('liczba_uzytkownika').value;
+        liczba = formatuj_liczbe(liczba);
+        let liczba_poprawna = sprawdz_liczbe(liczba);
+        // dostęp do pola z wynikiem
+        let wynik = document.getElementById('wynik');
+        // dostęp do pola z wiadomością
+        let wiadomosc = document.getElementById('wiadomosc');
+
+        if (liczba_poprawna) {
+            let [zlotowki, grosze] = rozdziel_liczbe(liczba);
+            // tworzenie słownej kwoty złotych
+            let slowo = '';
+            slowo += slownie_zlotych(zlotowki);
+            // tworzenie słownej kwoty groszy
+            slowo += ' ';
+            slowo += slownie_groszy(grosze);
+
+            // prezentowanie kwoty słownej użytkownikowi
+            wynik.value = slowo;
+
+            // usuń wiadomość o błędnej liczbie
+            wiadomosc.textContent = '.';
+            wiadomosc.className = 'hide';
+            // do testowania
+            console.log(zlotowki, ' ', grosze, slowo);
+        } else {
+            // poinformuj użytkownika o błędnej liczbie
+            wiadomosc.textContent = 'nieprawidłowa liczba';
+            wiadomosc.className = 'show';
+            // wyczyść pole z wynikiem
+            wynik.value = '';
+        };
+        // ukryj wiadomość gdy użytkownik poprawi liczbę
+        if (liczba.length == 0 ) {
+            wyczysc_liczbe();
+        };
+    };
+    // wywoływanie funkcji tworz_kwote_slownie()
+    let start = document.getElementById('liczba_uzytkownika');
+    start.addEventListener('input', tworz_kwote_slownie, false);
+    // przycisk kasowania liczby
+    let kasuj = document.getElementById('kasuj');
+    kasuj.addEventListener('click', wyczysc_liczbe, false);
+
+
+</script>
+</body>
+</html>

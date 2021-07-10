@@ -279,6 +279,16 @@ class NamesTestCase(unittest.TestCase):
         self.assertEqual(kwota.slownie_zlotych('100001000'),
             'sto milionów jeden tysiąc złotych')
 
+    def test_slownie_zlotych29(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('101201701'),
+            'sto jeden milionów dwieście jeden tysięcy siedemset jeden złotych')
+
+    def test_slownie_zlotych30(self):
+        """Czy liczba jest prawidłowo zamieniana na postać słowną?"""
+        self.assertEqual(kwota.slownie_zlotych('102202702'),
+            'sto dwa miliony dwieście dwa tysiące siedemset dwa złote')
+
     def test_slownie_groszy01(self):
         """Czy liczba '0' jest prawidłowo zamieniana?"""
         self.assertEqual(kwota.slownie_groszy('0'), 'zero groszy')

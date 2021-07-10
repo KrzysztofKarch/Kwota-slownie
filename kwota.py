@@ -99,9 +99,13 @@ def slowo_zlotych(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "złote".
     """
-    # o poprawnej odmianie decydują 2 ostatnie cyfry
+    # obsługa 3 i więcej cyfr
     if len(x) >= 3:
-        x = x[-2:]
+        if x[-2:] == '01':
+            return 'złotych'
+        else:
+            x = x[-2:]
+    # obsługa 2 cyfr
     if int(x) < 10:
         zlotych = {'0': 'złotych',
                 '1': 'złoty',
@@ -164,12 +168,17 @@ def slowo_tysiecy(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "tysiąc".
     """
-    # przypadek szczególny słowo może zawierać pełne miliony
-    if int(x) == 0:
-        return ''
-    # o poprawnej odmianie decydują 2 ostatnie cyfry
-    if len(x) >= 3:
-        x = x[-2:]
+    # obsługa 3 cyfr
+    if len(x) == 3:
+        if x == '000':
+            return ''
+        elif x == '001':
+            return 'tysiąc '
+        elif x[-2:] == '01':
+            return 'tysięcy '
+        else:
+            x = x[-2:]
+    # obsługa 2 cyfr
     if int(x) < 10:
         tysiecy = {'0': 'tysięcy ',
                 '1': 'tysiąc ',
@@ -201,9 +210,13 @@ def slowo_milionow(x: str):
     """
     Funkcja dbająca o poprawną końcówkę słowa "milion".
     """
-    # o poprawnej odmianie decydują 2 ostatnie cyfry
+    # obsługa 3 i więcej cyfr
     if len(x) >= 3:
-        x = x[-2:]
+        if x[-2:] == '01':
+            return 'milionów '
+        else:
+            x = x[-2:]
+    # obsługa 2 cyfr
     if int(x) < 10:
         milionow = {'0': 'milionów ',
                 '1': 'milion ',
