@@ -5,7 +5,7 @@ na liczbę zapisaną słownie. Pełne nazewnictwo złotych i groszy.
 
 Autor: Krzysztof Karch 
 Mail:  krzysztof.karch@wp.pl
-Modyfikacja: 08.07.2021
+Modyfikacja: 12.07.2021
 -->
 <html>
 <head>
@@ -94,6 +94,11 @@ Modyfikacja: 08.07.2021
             box-shadow: 1px 1px 1px black;
             color: red;
         }
+        #main #kasuj:active {
+            position: relative;
+            top: 2px;
+            left: 2px;
+        }
         #main #wiadomosc {
             margin: 5px 0px 5px 20px;
             color: red;
@@ -116,12 +121,16 @@ Modyfikacja: 08.07.2021
             align-items: center;
             margin: 5px auto 20px auto;
             padding: 6px 80px 6px 80px;
+            box-shadow: 1px 1px 1px black;
             font-size: 1em;
             font-family: Courier New;
             font-weight: bold;
             letter-spacing: 0.1em;
-            /* ukryj */
-            visibility: hidden;
+        }
+        #main #kopiuj:active {
+            position: relative;
+            top: 2px;
+            left: 2px;
         }
     </style>
 </head>
@@ -520,6 +529,16 @@ Zakres 0 - 999 999 999.99
         document.getElementById('wiadomosc').className = 'hide';
         document.getElementById('liczba_uzytkownika').focus();
     };
+    function kopiuj_kwote() {
+        // kopiuje kwotę słowną do schowka
+        let kwota = document.getElementById('wynik');
+        kwota.select();
+        document.execCommand('copy');
+        // Usuń zaznaczenie w Chrome
+        document.getSelection().empty();
+        // Usuń zaznaczenie w Firefox
+        kwota.setSelectionRange(0, 0);
+    };
     function tworz_kwote_slownie() {
         // main
         // tworzenie pełnej, słownej reprezentacji kwoty podanej przez użytkownika
@@ -566,6 +585,9 @@ Zakres 0 - 999 999 999.99
     // przycisk kasowania liczby
     let kasuj = document.getElementById('kasuj');
     kasuj.addEventListener('click', wyczysc_liczbe, false);
+    // przycisk kopiowania kwoty słownej
+    let kopiuj = document.getElementById('kopiuj');
+    kopiuj.addEventListener('click', kopiuj_kwote, false);
 
 
 </script>
